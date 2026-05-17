@@ -325,6 +325,12 @@ Hooks are configured in `.claude/settings.json` and fire automatically when you 
 
 ### `.claude/settings.json` Format
 
+There are two install modes. Pick based on where you want hooks to fire.
+
+**Mode 1: Local-only (hooks fire only when `cwd` is this repo)**
+
+This is what ships in the repo by default. Relative paths only resolve correctly when Claude Code's `cwd` is the credco-memory-compiler clone itself:
+
 ```json
 {
   "hooks": {
@@ -335,7 +341,23 @@ Hooks are configured in `.claude/settings.json` and fire automatically when you 
 }
 ```
 
-Commands use simple relative paths from the project root. Empty `matcher` catches all events.
+**Mode 2: Cross-project (hooks fire from any project — recommended for daily use)**
+
+Place this `.claude/settings.json` either in another project (project-scoped) or in `~/.claude/settings.json` (global, fires in every Claude Code session). Replace `<ROOT>` with the absolute path to the credco-memory-compiler clone:
+
+```json
+{
+  "hooks": {
+    "SessionStart": [{ "matcher": "", "hooks": [{ "type": "command", "command": "uv run --directory <ROOT> python <ROOT>/hooks/session-start.py", "timeout": 15 }] }],
+    "PreCompact": [{ "matcher": "", "hooks": [{ "type": "command", "command": "uv run --directory <ROOT> python <ROOT>/hooks/pre-compact.py", "timeout": 10 }] }],
+    "SessionEnd": [{ "matcher": "", "hooks": [{ "type": "command", "command": "uv run --directory <ROOT> python <ROOT>/hooks/session-end.py", "timeout": 10 }] }]
+  }
+}
+```
+
+The `--directory <ROOT>` flag tells `uv` where to find `pyproject.toml` regardless of the current working directory. Without it, hooks silently fail in any project that isn't credco-memory-compiler itself — `uv` exits looking for a `pyproject.toml` it can't find, with no message visible to the user.
+
+Empty `matcher` catches all events.
 
 ### Hook Details
 
@@ -500,6 +522,61 @@ No API key needed - uses Claude Code's built-in credentials at `~/.claude/.crede
 | Full lint (with contradictions) | ~$0.15-0.25 |
 | Structural lint only | $0.00 |
 | Memory flush (per session) | ~$0.02-0.05 |
+
+---
+
+## Troubleshooting
+
+The single most useful diagnostic is `scripts/flush.log`. Both hooks and `flush.py` append there with timestamps, so when something appears to "not work," start there:
+
+```bash
+tail -50 scripts/flush.log
+```
+
+### Common failure modes
+
+| Symptom | Likely cause | Fix |
+|---|---|---|
+| No `daily/YYYY-MM-DD.md` ever appears | Hook command path resolves incorrectly | Use absolute paths with `uv run --directory <ROOT>` (see Mode 2 in Hook System section) |
+| `flush.log` shows `uv: command not found` | Hook shell doesn't have `uv` on PATH | Add `~/.local/bin` to PATH in shell rc; restart terminal |
+| `flush.log` shows `No \`pyproject.toml\` found` | Same as above — relative path issue | Same fix |
+| `flush.log` shows `SKIP: only N turns (min 3)` | Conversation too short | Have a 3+ turn conversation before exiting |
+| `flush.log` shows `SKIP: no transcript path` | Known Claude Code bug #13668 | Harmless. Next session works |
+| Daily log gets duplicate entries | Race between PreCompact + SessionEnd | Already mitigated by `last-flush.json` dedup (120s window) |
+| `flush.log` grows huge over months | No log rotation built in | Manually `rm scripts/flush.log` periodically, or add `RotatingFileHandler` |
+| `compile.py` never runs automatically | After-hours check failed for your timezone | Set `COMPILE_AFTER_HOUR` in `flush.py` and `TIMEZONE` in `config.py` to your timezone; or run `uv run python scripts/compile.py` manually |
+
+### Smoke tests (run after install)
+
+```bash
+# 1. SessionStart hook should print JSON
+uv run python hooks/session-start.py
+
+# 2. Structural lint should pass (no LLM call, free)
+uv run python scripts/lint.py --structural-only
+
+# 3. Compile dry-run (won't actually run if no daily logs exist)
+uv run python scripts/compile.py --dry-run
+```
+
+If all three pass without exception, the base install is good. From there, the only remaining failure points are hook path configuration (Mode 1 vs Mode 2) and `uv` being on PATH inside the hook's subshell.
+
+### Verifying end-to-end after hook activation
+
+```bash
+# Open Claude Code in a project where hooks are active
+# Have a 3+ turn conversation, then /exit
+# Wait ~30s (flush.py runs async)
+
+# Check that a daily log was generated
+ls -lh <ROOT>/daily/
+
+# Check flush.log for confirmation that flush.py ran end-to-end
+tail -30 <ROOT>/scripts/flush.log
+
+# Manually inspect what got captured
+cat <ROOT>/daily/$(date +%Y-%m-%d).md
+```
 
 ---
 
