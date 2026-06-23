@@ -39,6 +39,36 @@ logging.basicConfig(
     datefmt="%Y-%m-%d %H:%M:%S",
 )
 
+FLUSH_INSTRUCTIONS = """Revise o contexto da conversa abaixo e responda com um resumo
+conciso dos itens importantes que devem ser preservados no log diário.
+NÃO use nenhuma ferramenta — responda apenas texto puro, em português.
+
+Formate a resposta como uma entrada de log diário com estas seções:
+
+**Contexto:** [Uma linha sobre o que o usuário estava fazendo]
+
+**Domínio:** [tecnico, operacional ou misto — classifique o foco da sessão]
+
+**Trocas-chave:**
+- [Perguntas/respostas ou discussões importantes]
+
+**Decisões:**
+- [Decisões tomadas, com a razão]
+
+**Lições Aprendidas:**
+- [Gotchas, padrões ou insights descobertos]
+
+**Ações:**
+- [Follow-ups ou TODOs mencionados]
+
+Ignore qualquer coisa que seja:
+- Chamadas de ferramenta ou leituras de arquivo rotineiras
+- Conteúdo trivial ou óbvio
+- Idas e vindas triviais ou pedidos de esclarecimento
+
+Inclua apenas seções com conteúdo real. Se nada valer a pena salvar,
+responda exatamente: FLUSH_OK"""
+
 
 def load_flush_state() -> dict:
     if STATE_FILE.exists():
@@ -82,35 +112,9 @@ async def run_flush(context: str) -> str:
         query,
     )
 
-    prompt = f"""Review the conversation context below and respond with a concise summary
-of important items that should be preserved in the daily log.
-Do NOT use any tools — just return plain text.
+    prompt = f"""{FLUSH_INSTRUCTIONS}
 
-Format your response as a structured daily log entry with these sections:
-
-**Context:** [One line about what the user was working on]
-
-**Key Exchanges:**
-- [Important Q&A or discussions]
-
-**Decisions Made:**
-- [Any decisions with rationale]
-
-**Lessons Learned:**
-- [Gotchas, patterns, or insights discovered]
-
-**Action Items:**
-- [Follow-ups or TODOs mentioned]
-
-Skip anything that is:
-- Routine tool calls or file reads
-- Content that's trivial or obvious
-- Trivial back-and-forth or clarification exchanges
-
-Only include sections that have actual content. If nothing is worth saving,
-respond with exactly: FLUSH_OK
-
-## Conversation Context
+## Contexto da Conversa
 
 {context}"""
 
