@@ -165,6 +165,7 @@ Síntese transversal ligando 2+ conceitos. Criados quando uma conversa revela um
 ```markdown
 ---
 title: "Connection: X and Y"
+dominio: misto   # tecnico | operacional | misto
 connects:
   - "concepts/concept-x"
   - "concepts/concept-y"
@@ -400,7 +401,7 @@ O flag `--directory <ROOT>` diz ao `uv` onde encontrar o `pyproject.toml` indepe
 - Protege contra `transcript_path` vazio (bug conhecido do Claude Code #13668)
 - Crítico para sessões longas: captura o contexto antes que a sumarização o descarte
 
-**Por que tanto PreCompact quanto SessionEnd?** Sessões longas podem disparar múltiplas compactações automáticas antes de você fechar a sessão. Sem PreCompact, o contexto intermediário se perde na sumarização antes que o SessionEnd ever dispare.
+**Por que tanto PreCompact quanto SessionEnd?** Sessões longas podem disparar múltiplas compactações automáticas antes de você fechar a sessão. Sem PreCompact, o contexto intermediário se perde na sumarização antes que o SessionEnd sequer dispare.
 
 ### Processo de Flush em Segundo Plano (`flush.py`)
 
