@@ -22,7 +22,24 @@ from utils import load_state, read_all_wiki_content, save_state
 ROOT_DIR = Path(__file__).resolve().parent.parent
 
 
-async def run_query(question: str, file_back: bool = False) -> str:
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(description="Consulta a base de conhecimento da credco")
+    parser.add_argument("question", help="A pergunta a fazer")
+    parser.add_argument(
+        "--file-back",
+        action="store_true",
+        help="Arquiva a resposta de volta na base como artigo Q&A",
+    )
+    parser.add_argument(
+        "--dominio",
+        choices=["tecnico", "operacional"],
+        default=None,
+        help="Filtra os conceitos por domínio (artigos 'misto' sempre incluídos)",
+    )
+    return parser
+
+
+async def run_query(question: str, file_back: bool = False, dominio: str | None = None) -> str:
     """Query the knowledge base and optionally file the answer back."""
     from claude_agent_sdk import (
         AssistantMessage,
@@ -32,7 +49,7 @@ async def run_query(question: str, file_back: bool = False) -> str:
         query,
     )
 
-    wiki_content = read_all_wiki_content()
+    wiki_content = read_all_wiki_content(dominio=dominio)
 
     tools = ["Read", "Glob", "Grep"]
     if file_back:
@@ -112,26 +129,20 @@ consulting the knowledge base below.
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Query the personal knowledge base")
-    parser.add_argument("question", help="The question to ask")
-    parser.add_argument(
-        "--file-back",
-        action="store_true",
-        help="File the answer back into the knowledge base as a Q&A article",
-    )
-    args = parser.parse_args()
+    args = build_parser().parse_args()
 
-    print(f"Question: {args.question}")
-    print(f"File back: {'yes' if args.file_back else 'no'}")
+    print(f"Pergunta: {args.question}")
+    print(f"File back: {'sim' if args.file_back else 'não'}")
+    print(f"Domínio: {args.dominio or 'todos'}")
     print("-" * 60)
 
-    answer = asyncio.run(run_query(args.question, file_back=args.file_back))
+    answer = asyncio.run(run_query(args.question, file_back=args.file_back, dominio=args.dominio))
     print(answer)
 
     if args.file_back:
         print("\n" + "-" * 60)
         qa_count = len(list(QA_DIR.glob("*.md"))) if QA_DIR.exists() else 0
-        print(f"Answer filed to knowledge/qa/ ({qa_count} Q&A articles total)")
+        print(f"Resposta arquivada em knowledge/qa/ ({qa_count} artigos Q&A no total)")
 
 
 if __name__ == "__main__":
