@@ -87,12 +87,12 @@ Uma tabela listando todos os artigos de conhecimento. É o mecanismo primário d
 Formato:
 
 ```markdown
-# Knowledge Base Index
+# Índice da Base de Conhecimento
 
 | Artigo | Resumo | dominio | Compilado de | Atualizado |
 |--------|--------|---------|--------------|------------|
 | [[concepts/migration-035-magali]] | Split de patrimônio na migration 035 | misto | daily/2026-06-23.md | 2026-06-23 |
-| [[connections/auth-and-webhooks]] | Padrões de verificação de token compartilhados entre Supabase auth e webhooks Stripe | daily/2026-04-02.md, daily/2026-04-04.md | 2026-04-04 |
+| [[connections/auth-and-webhooks]] | Padrões de verificação de token compartilhados entre Supabase auth e webhooks Stripe | misto | daily/2026-04-02.md, daily/2026-04-04.md | 2026-04-04 |
 ```
 
 ### `knowledge/log.md` - Log de Compilação
@@ -136,19 +136,19 @@ sources:
 
 [Explicação central em 2-4 frases]
 
-## Key Points
+## Pontos-Chave
 
 - [Pontos objetivos, cada um independente]
 
-## Details
+## Detalhes
 
 [Explicação aprofundada, parágrafos estilo enciclopédia]
 
-## Related Concepts
+## Conceitos Relacionados
 
 - [[concepts/conceito-relacionado]] - Como se conecta
 
-## Sources
+## Fontes
 
 - [[daily/2026-06-23.md]] - Descoberta inicial durante a configuração do projeto
 ```
@@ -164,7 +164,7 @@ Síntese transversal ligando 2+ conceitos. Criados quando uma conversa revela um
 
 ```markdown
 ---
-title: "Connection: X and Y"
+title: "Conexão: X e Y"
 dominio: misto   # tecnico | operacional | misto
 connects:
   - "concepts/concept-x"
@@ -175,21 +175,21 @@ created: 2026-04-04
 updated: 2026-04-04
 ---
 
-# Connection: X and Y
+# Conexão: X e Y
 
-## The Connection
+## A Conexão
 
 [O que liga esses conceitos]
 
-## Key Insight
+## Insight Principal
 
 [A relação não óbvia descoberta]
 
-## Evidence
+## Evidência
 
 [Exemplos específicos das conversas]
 
-## Related Concepts
+## Conceitos Relacionados
 
 - [[concepts/concept-x]]
 - [[concepts/concept-y]]
@@ -211,11 +211,11 @@ filed: 2026-04-05
 
 # Q: Pergunta Original
 
-## Answer
+## Resposta
 
 [A resposta sintetizada com citações [[wikilinks]]]
 
-## Sources Consulted
+## Fontes Consultadas
 
 - [[concepts/article-1]] - Relevante porque...
 - [[concepts/article-2]] - Forneceu contexto sobre...

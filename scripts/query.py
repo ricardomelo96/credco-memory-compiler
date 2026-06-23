@@ -60,38 +60,39 @@ async def run_query(question: str, file_back: bool = False, dominio: str | None 
         timestamp = now_iso()
         file_back_instructions = f"""
 
-## File Back Instructions
+## Instruções de Arquivamento (File Back)
 
-After answering, do the following:
-1. Create a Q&A article at {QA_DIR}/ with the filename being a slugified version
-   of the question (e.g., knowledge/qa/how-to-handle-auth-redirects.md)
-2. Use the Q&A article format from the schema (frontmatter with title, question,
-   consulted articles, filed date)
-3. Update {KNOWLEDGE_DIR / 'index.md'} with a new row for this Q&A article
-4. Append to {KNOWLEDGE_DIR / 'log.md'}:
-   ## [{timestamp}] query (filed) | question summary
-   - Question: {question}
-   - Consulted: [[list of articles read]]
-   - Filed to: [[qa/article-name]]
+Após responder, faça o seguinte:
+1. Crie um artigo Q&A em {QA_DIR}/ com o nome do arquivo sendo uma versão
+   slugificada da pergunta (ex.: knowledge/qa/como-aplicar-migration-035.md)
+2. Use o formato de artigo Q&A do schema (frontmatter com title, question,
+   consulted, filed)
+3. Atualize {KNOWLEDGE_DIR / 'index.md'} com uma nova linha para este artigo Q&A
+   (incluindo a coluna dominio)
+4. Anexe ao {KNOWLEDGE_DIR / 'log.md'}:
+   ## [{timestamp}] query (filed) | resumo da pergunta
+   - Pergunta: {question}
+   - Consultados: [[lista de artigos lidos]]
+   - Arquivado em: [[qa/nome-do-artigo]]
 """
 
-    prompt = f"""You are a knowledge base query engine. Answer the user's question by
-consulting the knowledge base below.
+    prompt = f"""Você é um motor de consulta da base de conhecimento. Responda à pergunta do
+usuário consultando a base abaixo. Responda em português.
 
-## How to Answer
+## Como Responder
 
-1. Read the INDEX section first - it lists every article with a one-line summary
-2. Identify 3-10 articles that are relevant to the question
-3. Read those articles carefully (they're included below)
-4. Synthesize a clear, thorough answer
-5. Cite your sources using [[wikilinks]] (e.g., [[concepts/supabase-auth]])
-6. If the knowledge base doesn't contain relevant information, say so honestly
+1. Leia a seção ÍNDICE primeiro - ela lista cada artigo com um resumo de uma linha
+2. Identifique de 3 a 10 artigos relevantes para a pergunta
+3. Leia esses artigos com atenção (eles estão incluídos abaixo)
+4. Sintetize uma resposta clara e completa
+5. Cite as fontes usando [[wikilinks]] (ex.: [[concepts/migration-035-write-functions]])
+6. Se a base não contiver informação relevante, diga isso honestamente
 
-## Knowledge Base
+## Base de Conhecimento
 
 {wiki_content}
 
-## Question
+## Pergunta
 
 {question}
 {file_back_instructions}"""

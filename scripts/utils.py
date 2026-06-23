@@ -94,7 +94,7 @@ def read_wiki_index() -> str:
     """Read the knowledge base index file."""
     if INDEX_FILE.exists():
         return INDEX_FILE.read_text(encoding="utf-8")
-    return "# Knowledge Base Index\n\n| Article | Summary | Compiled From | Updated |\n|---------|---------|---------------|---------|"
+    return "# Índice da Base de Conhecimento\n\n| Artigo | Resumo | dominio | Compilado de | Atualizado |\n|--------|--------|---------|--------------|------------|"
 
 
 def read_all_wiki_content(dominio: str | None = None) -> str:
