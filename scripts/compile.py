@@ -31,6 +31,34 @@ from utils import (
 # ── Paths for the LLM to use ──────────────────────────────────────────
 ROOT_DIR = Path(__file__).resolve().parent.parent
 
+COMPILE_INSTRUCTIONS = """## Sua Tarefa
+
+Leia o log diário acima e compile-o em artigos de wiki seguindo o schema à risca.
+Escreva todo o conteúdo em português (preservando termos técnicos e nomes próprios
+em inglês).
+
+### Regras:
+
+1. **Extrair conceitos-chave** — identifique 3-7 conceitos distintos que merecem artigo próprio.
+2. **Criar artigos de conceito** em `knowledge/concepts/` — um .md por conceito.
+   - Use o formato exato do AGENTS.md (frontmatter YAML + seções).
+   - Preencha `dominio:` com `tecnico`, `operacional` ou `misto`.
+   - Inclua `sources:` apontando para o log diário.
+   - Use wikilinks `[[concepts/slug]]` para ligar conceitos relacionados.
+3. **Criar artigos de conexão** em `knowledge/connections/` quando o log revelar
+   relações não-óbvias entre 2+ conceitos. Conceitos `misto` (que cruzam técnico e
+   operacional) devem preferencialmente virar uma `connection`.
+4. **Atualizar artigos existentes** quando o log adicionar informação a conceitos já no wiki.
+5. **Atualizar knowledge/index.md** — adicione novas linhas à tabela, incluindo a
+   coluna `dominio`: `| [[path/slug]] | Resumo | dominio | source-file | data |`
+6. **Anexar a knowledge/log.md** — entrada com timestamp registrando artigos criados/atualizados.
+
+### Padrões de qualidade:
+- Todo artigo precisa de frontmatter YAML completo, incluindo `dominio`.
+- Todo artigo deve linkar a pelo menos 2 outros via [[wikilinks]].
+- Seção de pontos-chave: 3-5 bullets. Detalhes: 2+ parágrafos. Relacionados: 2+ entradas.
+- A seção Fontes deve citar o log diário com as afirmações específicas extraídas."""
+
 
 async def compile_daily_log(log_path: Path, state: dict) -> float:
     """Compile a single daily log into knowledge articles.
@@ -77,7 +105,7 @@ and extract knowledge into structured wiki articles.
 
 ## Existing Wiki Articles
 
-{existing_articles_context if existing_articles_context else "(No existing articles yet)"}
+{existing_articles_context if existing_articles_context else "(Nenhum artigo existente ainda)"}
 
 ## Daily Log to Compile
 
@@ -85,45 +113,14 @@ and extract knowledge into structured wiki articles.
 
 {log_content}
 
-## Your Task
+{COMPILE_INSTRUCTIONS}
 
-Read the daily log above and compile it into wiki articles following the schema exactly.
-
-### Rules:
-
-1. **Extract key concepts** - Identify 3-7 distinct concepts worth their own article
-2. **Create concept articles** in `knowledge/concepts/` - One .md file per concept
-   - Use the exact article format from AGENTS.md (YAML frontmatter + sections)
-   - Include `sources:` in frontmatter pointing to the daily log file
-   - Use `[[concepts/slug]]` wikilinks to link to related concepts
-   - Write in encyclopedia style - neutral, comprehensive
-3. **Create connection articles** in `knowledge/connections/` if this log reveals non-obvious
-   relationships between 2+ existing concepts
-4. **Update existing articles** if this log adds new information to concepts already in the wiki
-   - Read the existing article, add the new information, add the source to frontmatter
-5. **Update knowledge/index.md** - Add new entries to the table
-   - Each entry: `| [[path/slug]] | One-line summary | source-file | {timestamp[:10]} |`
-6. **Append to knowledge/log.md** - Add a timestamped entry:
-   ```
-   ## [{timestamp}] compile | {log_path.name}
-   - Source: daily/{log_path.name}
-   - Articles created: [[concepts/x]], [[concepts/y]]
-   - Articles updated: [[concepts/z]] (if any)
-   ```
-
-### File paths:
-- Write concept articles to: {CONCEPTS_DIR}
-- Write connection articles to: {CONNECTIONS_DIR}
-- Update index at: {KNOWLEDGE_DIR / 'index.md'}
-- Append log at: {KNOWLEDGE_DIR / 'log.md'}
-
-### Quality standards:
-- Every article must have complete YAML frontmatter
-- Every article must link to at least 2 other articles via [[wikilinks]]
-- Key Points section should have 3-5 bullet points
-- Details section should have 2+ paragraphs
-- Related Concepts section should have 2+ entries
-- Sources section should cite the daily log with specific claims extracted
+### Caminhos de arquivo:
+- Artigos de conceito em: {CONCEPTS_DIR}
+- Artigos de conexão em: {CONNECTIONS_DIR}
+- Índice em: {KNOWLEDGE_DIR / 'index.md'}
+- Log em: {KNOWLEDGE_DIR / 'log.md'}
+- Timestamp para as entradas: {timestamp}
 """
 
     cost = 0.0
