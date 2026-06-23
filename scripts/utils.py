@@ -49,6 +49,32 @@ def slugify(text: str) -> str:
     return text.strip("-")
 
 
+# ── Frontmatter helpers ───────────────────────────────────────────────
+
+def parse_frontmatter_field(content: str, field: str) -> str | None:
+    """Return the value of a top-level scalar field in the YAML frontmatter, or None."""
+    if not content.startswith("---"):
+        return None
+    end = content.find("\n---", 3)
+    if end == -1:
+        return None
+    block = content[3:end]
+    for line in block.splitlines():
+        stripped = line.strip()
+        if stripped.startswith(f"{field}:"):
+            value = stripped[len(field) + 1:].strip()
+            return value.strip("\"'") or None
+    return None
+
+
+def article_matches_domain(content: str, dominio: str | None) -> bool:
+    """True if no domain filter, or the article's dominio is the target or 'misto'."""
+    if dominio is None:
+        return True
+    art_dom = parse_frontmatter_field(content, "dominio")
+    return art_dom in (dominio, "misto")
+
+
 # ── Wikilink helpers ──────────────────────────────────────────────────
 
 def extract_wikilinks(content: str) -> list[str]:
@@ -71,16 +97,22 @@ def read_wiki_index() -> str:
     return "# Knowledge Base Index\n\n| Article | Summary | Compiled From | Updated |\n|---------|---------|---------------|---------|"
 
 
-def read_all_wiki_content() -> str:
-    """Read index + all wiki articles into a single string for context."""
+def read_all_wiki_content(dominio: str | None = None) -> str:
+    """Read index + all wiki articles into a single string for context.
+
+    When `dominio` is given, concept articles are filtered to that domain
+    (plus 'misto'); connections/ and qa/ are always included.
+    """
     parts = [f"## INDEX\n\n{read_wiki_index()}"]
 
     for subdir in [CONCEPTS_DIR, CONNECTIONS_DIR, QA_DIR]:
         if not subdir.exists():
             continue
         for md_file in sorted(subdir.glob("*.md")):
-            rel = md_file.relative_to(KNOWLEDGE_DIR)
             content = md_file.read_text(encoding="utf-8")
+            if subdir == CONCEPTS_DIR and not article_matches_domain(content, dominio):
+                continue
+            rel = md_file.relative_to(KNOWLEDGE_DIR)
             parts.append(f"## {rel}\n\n{content}")
 
     return "\n\n---\n\n".join(parts)
