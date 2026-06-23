@@ -1,27 +1,27 @@
-# AGENTS.md - Personal Knowledge Base Schema
+# AGENTS.md - Esquema da Base de Conhecimento Pessoal
 
-> Adapted from [Andrej Karpathy's LLM Knowledge Base](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f) architecture.
-> Instead of ingesting external articles, this system compiles knowledge from your own AI conversations.
+> Adaptado da arquitetura de [Base de Conhecimento com LLM do Andrej Karpathy](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f).
+> Em vez de ingerir artigos externos, este sistema compila conhecimento a partir das suas próprias conversas com IA.
 
-## The Compiler Analogy
+## A Analogia do Compilador
 
 ```
-daily/          = source code    (your conversations - the raw material)
-LLM             = compiler       (extracts and organizes knowledge)
-knowledge/      = executable     (structured, queryable knowledge base)
-lint            = test suite     (health checks for consistency)
-queries         = runtime        (using the knowledge)
+daily/          = código-fonte   (suas conversas — o material bruto)
+LLM             = compilador     (extrai e organiza o conhecimento)
+knowledge/      = executável     (base de conhecimento estruturada e consultável)
+lint            = suite de testes(verificações de saúde e consistência)
+queries         = runtime        (uso do conhecimento)
 ```
 
-You don't manually organize your knowledge. You have conversations, and the LLM handles the synthesis, cross-referencing, and maintenance.
+Você não organiza o conhecimento manualmente. Você tem conversas, e o LLM cuida da síntese, das referências cruzadas e da manutenção.
 
 ---
 
-## Architecture
+## Arquitetura
 
-### Layer 1: `daily/` - Conversation Logs (Immutable Source)
+### Camada 1: `daily/` - Registros de Conversa (Fonte Imutável)
 
-Daily logs capture what happened in your AI coding sessions. These are the "raw sources" - append-only, never edited after the fact.
+Os registros diários capturam o que aconteceu nas suas sessões de programação com IA. São as "fontes brutas" — append-only, nunca editadas depois do fato.
 
 ```
 daily/
@@ -30,76 +30,76 @@ daily/
 ├── ...
 ```
 
-Each file follows this format:
+Cada arquivo segue este formato:
 
 ```markdown
 # Daily Log: YYYY-MM-DD
 
 ## Sessions
 
-### Session (HH:MM) - Brief Title
+### Session (HH:MM) - Título Breve
 
-**Context:** What the user was working on.
+**Context:** O que o usuário estava trabalhando.
 
 **Key Exchanges:**
-- User asked about X, assistant explained Y
-- Decided to use Z approach because...
-- Discovered that W doesn't work when...
+- Usuário perguntou sobre X, assistente explicou Y
+- Decidiu usar abordagem Z porque...
+- Descobriu que W não funciona quando...
 
 **Decisions Made:**
-- Chose library X over Y because...
-- Architecture: went with pattern Z
+- Escolheu biblioteca X em vez de Y porque...
+- Arquitetura: adotou o padrão Z
 
 **Lessons Learned:**
-- Always do X before Y to avoid...
-- The gotcha with Z is that...
+- Sempre faça X antes de Y para evitar...
+- O problema com Z é que...
 
 **Action Items:**
-- [ ] Follow up on X
-- [ ] Refactor Y when time permits
+- [ ] Acompanhar X
+- [ ] Refatorar Y quando houver tempo
 ```
 
-### Layer 2: `knowledge/` - Compiled Knowledge (LLM-Owned)
+### Camada 2: `knowledge/` - Conhecimento Compilado (Propriedade do LLM)
 
-The LLM owns this directory entirely. Humans read it but rarely edit it directly.
+O LLM é o dono deste diretório. Humanos leem, mas raramente editam diretamente.
 
 ```
 knowledge/
-├── index.md              # Master catalog - every article with one-line summary
-├── log.md                # Append-only chronological build log
-├── concepts/             # Atomic knowledge articles
-├── connections/          # Cross-cutting insights linking 2+ concepts
-└── qa/                   # Filed query answers (compounding knowledge)
+├── index.md              # Catálogo mestre — cada artigo com resumo de uma linha
+├── log.md                # Log cronológico append-only de compilações
+├── concepts/             # Artigos atômicos de conhecimento
+├── connections/          # Insights transversais ligando 2+ conceitos
+└── qa/                   # Respostas arquivadas a consultas (conhecimento composto)
 ```
 
-### Layer 3: This File (AGENTS.md)
+### Camada 3: Este Arquivo (AGENTS.md)
 
-The schema that tells the LLM how to compile and maintain the knowledge base. This is the "compiler specification."
+O esquema que diz ao LLM como compilar e manter a base de conhecimento. Esta é a "especificação do compilador."
 
 ---
 
-## Structural Files
+## Arquivos Estruturais
 
-### `knowledge/index.md` - Master Catalog
+### `knowledge/index.md` - Catálogo Mestre
 
-A table listing every knowledge article. This is the primary retrieval mechanism - the LLM reads this FIRST when answering any query, then selects relevant articles to read in full.
+Uma tabela listando todos os artigos de conhecimento. É o mecanismo primário de recuperação — o LLM lê isso PRIMEIRO ao responder qualquer consulta, depois seleciona os artigos relevantes para ler na íntegra.
 
-Format:
+Formato:
 
 ```markdown
 # Knowledge Base Index
 
-| Article | Summary | Compiled From | Updated |
-|---------|---------|---------------|---------|
-| [[concepts/supabase-auth]] | Row-level security patterns and JWT gotchas | daily/2026-04-02.md | 2026-04-02 |
-| [[connections/auth-and-webhooks]] | Token verification patterns shared across Supabase auth and Stripe webhooks | daily/2026-04-02.md, daily/2026-04-04.md | 2026-04-04 |
+| Artigo | Resumo | dominio | Compilado de | Atualizado |
+|--------|--------|---------|--------------|------------|
+| [[concepts/migration-035-magali]] | Split de patrimônio na migration 035 | misto | daily/2026-06-23.md | 2026-06-23 |
+| [[connections/auth-and-webhooks]] | Padrões de verificação de token compartilhados entre Supabase auth e webhooks Stripe | daily/2026-04-02.md, daily/2026-04-04.md | 2026-04-04 |
 ```
 
-### `knowledge/log.md` - Build Log
+### `knowledge/log.md` - Log de Compilação
 
-Append-only chronological record of every compile, query, and lint operation.
+Registro cronológico append-only de cada operação de compilação, consulta e lint.
 
-Format:
+Formato:
 
 ```markdown
 # Build Log
@@ -116,49 +116,51 @@ Format:
 
 ---
 
-## Article Formats
+## Formatos de Artigo
 
-### Concept Articles (`knowledge/concepts/`)
+### Artigos de Conceito (`knowledge/concepts/`)
 
-One article per atomic piece of knowledge. These are facts, patterns, decisions, preferences, and lessons extracted from your conversations.
+Um artigo por unidade atômica de conhecimento. São fatos, padrões, decisões, preferências e lições extraídas das suas conversas.
 
 ```markdown
 ---
-title: "Concept Name"
-aliases: [alternate-name, abbreviation]
-tags: [domain, topic]
+title: Nome do Conceito
+dominio: tecnico   # tecnico | operacional | misto
+created: 2026-06-23
+updated: 2026-06-23
 sources:
-  - "daily/2026-04-01.md"
-  - "daily/2026-04-03.md"
-created: 2026-04-01
-updated: 2026-04-03
+  - daily/2026-06-23.md
 ---
 
-# Concept Name
+# Nome do Conceito
 
-[2-4 sentence core explanation]
+[Explicação central em 2-4 frases]
 
 ## Key Points
 
-- [Bullet points, each self-contained]
+- [Pontos objetivos, cada um independente]
 
 ## Details
 
-[Deeper explanation, encyclopedia-style paragraphs]
+[Explicação aprofundada, parágrafos estilo enciclopédia]
 
 ## Related Concepts
 
-- [[concepts/related-concept]] - How it connects
+- [[concepts/conceito-relacionado]] - Como se conecta
 
 ## Sources
 
-- [[daily/2026-04-01.md]] - Initial discovery during project setup
-- [[daily/2026-04-03.md]] - Updated after debugging session
+- [[daily/2026-06-23.md]] - Descoberta inicial durante a configuração do projeto
 ```
 
-### Connection Articles (`knowledge/connections/`)
+**Campo `dominio`:**
+- `tecnico` — arquitetura, migrations, RLS, bugs, padrões de código.
+- `operacional` — decisões de produto/negócio, processos, escolhas estratégicas, regras de atendimento.
+- `misto` — quando os dois mundos se cruzam. Prefira materializar a relação como artigo em `connections/`.
 
-Cross-cutting synthesis linking 2+ concepts. Created when a conversation reveals a non-obvious relationship.
+### Artigos de Conexão (`knowledge/connections/`)
+
+Síntese transversal ligando 2+ conceitos. Criados quando uma conversa revela uma relação não óbvia.
 
 ```markdown
 ---
@@ -176,15 +178,15 @@ updated: 2026-04-04
 
 ## The Connection
 
-[What links these concepts]
+[O que liga esses conceitos]
 
 ## Key Insight
 
-[The non-obvious relationship discovered]
+[A relação não óbvia descoberta]
 
 ## Evidence
 
-[Specific examples from conversations]
+[Exemplos específicos das conversas]
 
 ## Related Concepts
 
@@ -192,144 +194,162 @@ updated: 2026-04-04
 - [[concepts/concept-y]]
 ```
 
-### Q&A Articles (`knowledge/qa/`)
+### Artigos de Q&A (`knowledge/qa/`)
 
-Filed answers from queries. Every complex question answered by the system can be permanently stored, making future queries smarter.
+Respostas arquivadas a consultas. Toda pergunta complexa respondida pelo sistema pode ser armazenada permanentemente, tornando futuras consultas mais precisas.
 
 ```markdown
 ---
-title: "Q: Original Question"
-question: "The exact question asked"
+title: "Q: Pergunta Original"
+question: "A pergunta exata feita"
 consulted:
   - "concepts/article-1"
   - "concepts/article-2"
 filed: 2026-04-05
 ---
 
-# Q: Original Question
+# Q: Pergunta Original
 
 ## Answer
 
-[The synthesized answer with [[wikilinks]] to sources]
+[A resposta sintetizada com citações [[wikilinks]]]
 
 ## Sources Consulted
 
-- [[concepts/article-1]] - Relevant because...
-- [[concepts/article-2]] - Provided context on...
+- [[concepts/article-1]] - Relevante porque...
+- [[concepts/article-2]] - Forneceu contexto sobre...
 
 ## Follow-Up Questions
 
-- What about edge case X?
-- How does this change if Y?
+- E o caso extremo X?
+- Como isso muda se Y?
 ```
 
 ---
 
-## Core Operations
+## Domínio credco
 
-### 1. Compile (daily/ -> knowledge/)
+Vocabulário do negócio que o compilador deve reconhecer e nomear de forma
+consistente ao criar conceitos:
 
-When processing a daily log:
+- **Tenants / `p_tenant_id`** — modelo multi-tenant; isolamento por tenant.
+- **Magali** — assistente/agente da credco; tem write-loop (`create_transaction`, `create_reminder`).
+- **transactions / reminders** — entidades centrais escritas pela Magali.
+- **n8n** — orquestração de automações (anon vs service_role).
+- **Evolution WhatsApp API / IG auto-responder** — canais de atendimento.
+- **patrim** — linha de projetos (ex.: patrim-nio-em-foco).
+- **Supabase / RLS** — banco e segurança a nível de linha.
+- **pg_cron / SDR** — jobs agendados de prospecção.
 
-1. Read the daily log file
-2. Read `knowledge/index.md` to understand current knowledge state
-3. Read existing articles that may need updating
-4. For each piece of knowledge found in the log:
-   - If an existing concept article covers this topic: UPDATE it with new information, add the daily log as a source
-   - If it's a new topic: CREATE a new `concepts/` article
-5. If the log reveals a non-obvious connection between 2+ existing concepts: CREATE a `connections/` article
-6. UPDATE `knowledge/index.md` with new/modified entries
-7. APPEND to `knowledge/log.md`
-
-**Important guidelines:**
-- A single daily log may touch 3-10 knowledge articles
-- Prefer updating existing articles over creating near-duplicates
-- Use Obsidian-style `[[wikilinks]]` with full relative paths from knowledge/
-- Write in encyclopedia style - factual, concise, self-contained
-- Every article must have YAML frontmatter
-- Every article must link back to its source daily logs
-
-### 2. Query (Ask the Knowledge Base)
-
-1. Read `knowledge/index.md` (the master catalog)
-2. Based on the question, identify 3-10 relevant articles from the index
-3. Read those articles in full
-4. Synthesize an answer with `[[wikilink]]` citations
-5. If `--file-back` is specified: create a `knowledge/qa/` article and update index.md and log.md
-
-**Why this works without RAG:** At personal knowledge base scale (50-500 articles), the LLM reading a structured index outperforms cosine similarity. The LLM understands what the question is really asking and selects pages accordingly. Embeddings find similar words; the LLM finds relevant concepts.
-
-### 3. Lint (Health Checks)
-
-Seven checks, run periodically:
-
-1. **Broken links** - `[[wikilinks]]` pointing to non-existent articles
-2. **Orphan pages** - Articles with zero inbound links from other articles
-3. **Orphan sources** - Daily logs that haven't been compiled yet
-4. **Stale articles** - Source daily log changed since article was last compiled
-5. **Contradictions** - Conflicting claims across articles (requires LLM judgment)
-6. **Missing backlinks** - A links to B but B doesn't link back to A
-7. **Sparse articles** - Below 200 words, likely incomplete
-
-Output: a markdown report with severity levels (error, warning, suggestion).
+Use estes nomes próprios em inglês sem traduzir.
 
 ---
 
-## Conventions
+## Operações Principais
 
-- **Wikilinks:** Use Obsidian-style `[[path/to/article]]` without `.md` extension
-- **Writing style:** Encyclopedia-style, factual, third-person where appropriate
-- **Dates:** ISO 8601 (YYYY-MM-DD for dates, full ISO for timestamps in log.md)
-- **File naming:** lowercase, hyphens for spaces (e.g., `supabase-row-level-security.md`)
-- **Frontmatter:** Every article must have YAML frontmatter with at minimum: title, sources, created, updated
-- **Sources:** Always link back to the daily log(s) that contributed to an article
+### 1. Compilar (daily/ -> knowledge/)
+
+Ao processar um registro diário:
+
+1. Ler o arquivo de log diário
+2. Ler `knowledge/index.md` para entender o estado atual do conhecimento
+3. Ler os artigos existentes que podem precisar de atualização
+4. Para cada piece de conhecimento encontrado no log:
+   - Se um artigo de conceito existente cobre este tópico: ATUALIZAR com novas informações, adicionar o log diário como fonte
+   - Se é um tópico novo: CRIAR um novo artigo em `concepts/`
+5. Se o log revela uma conexão não óbvia entre 2+ conceitos existentes: CRIAR um artigo em `connections/`
+6. ATUALIZAR `knowledge/index.md` com entradas novas/modificadas
+7. ADICIONAR ao `knowledge/log.md`
+
+**Diretrizes importantes:**
+- Um único log diário pode tocar 3-10 artigos de conhecimento
+- Prefira atualizar artigos existentes a criar quase-duplicatas
+- Use `[[wikilinks]]` estilo Obsidian com caminhos relativos completos a partir de `knowledge/`
+- Escreva em estilo enciclopédia — factual, conciso, autocontido
+- Todo artigo deve ter frontmatter YAML
+- Todo artigo deve referenciar os logs diários de origem
+
+### 2. Consultar (Ask the Knowledge Base)
+
+1. Ler `knowledge/index.md` (o catálogo mestre)
+2. Com base na pergunta, identificar 3-10 artigos relevantes no índice
+3. Ler esses artigos na íntegra
+4. Sintetizar uma resposta com citações `[[wikilink]]`
+5. Se `--file-back` for especificado: criar um artigo em `knowledge/qa/` e atualizar index.md e log.md
+
+**Por que funciona sem RAG:** Na escala de uma base de conhecimento pessoal (50-500 artigos), o LLM lendo um índice estruturado supera a similaridade por cosseno. O LLM entende o que a pergunta realmente quer e seleciona as páginas adequadamente. Embeddings encontram palavras similares; o LLM encontra conceitos relevantes.
+
+### 3. Lint (Verificações de Saúde)
+
+Sete verificações, executadas periodicamente:
+
+1. **Links quebrados** — `[[wikilinks]]` apontando para artigos inexistentes
+2. **Páginas órfãs** — artigos com zero links de entrada de outros artigos
+3. **Fontes órfãs** — logs diários que ainda não foram compilados
+4. **Artigos desatualizados** — log diário de origem mudou desde a última compilação
+5. **Contradições** — afirmações conflitantes entre artigos (requer julgamento do LLM)
+6. **Backlinks ausentes** — A linka para B mas B não linka de volta para A
+7. **Artigos esparsos** — abaixo de 200 palavras, provavelmente incompletos
+
+Saída: um relatório markdown com níveis de severidade (error, warning, suggestion).
 
 ---
 
-## Full Project Structure
+## Convenções
+
+- **Wikilinks:** Use o estilo Obsidian `[[caminho/para/artigo]]` sem extensão `.md`
+- **Estilo de escrita:** Estilo enciclopédia, factual, terceira pessoa quando apropriado
+- **Datas:** ISO 8601 (YYYY-MM-DD para datas, ISO completo para timestamps em log.md)
+- **Nomenclatura de arquivos:** minúsculas, hífens para espaços (ex.: `supabase-row-level-security.md`)
+- **Frontmatter:** Todo artigo deve ter frontmatter YAML com no mínimo: title, dominio, sources, created, updated
+- **Fontes:** Sempre referencie os log(s) diário(s) que contribuíram para um artigo
+
+---
+
+## Estrutura Completa do Projeto
 
 ```
-llm-personal-kb/
+credco-memory-compiler/
 |-- .claude/
-|   |-- settings.json                # Hook configuration (auto-activates in Claude Code)
-|-- .gitignore                       # Excludes runtime state, temp files, caches
-|-- AGENTS.md                        # This file - schema + full technical reference
-|-- README.md                        # Concise overview + quick start
-|-- pyproject.toml                   # Dependencies (at root so hooks can find it)
-|-- daily/                           # "Source code" - conversation logs (immutable)
-|-- knowledge/                       # "Executable" - compiled knowledge (LLM-owned)
-|   |-- index.md                     #   Master catalog - THE retrieval mechanism
-|   |-- log.md                       #   Append-only build log
-|   |-- concepts/                    #   Atomic knowledge articles
-|   |-- connections/                 #   Cross-cutting insights linking 2+ concepts
-|   |-- qa/                          #   Filed query answers (compounding knowledge)
-|-- scripts/                         # CLI tools
-|   |-- compile.py                   #   Compile daily logs -> knowledge articles
-|   |-- query.py                     #   Ask questions (index-guided, no RAG)
-|   |-- lint.py                      #   7 health checks
-|   |-- flush.py                     #   Extract memories from conversations (background)
-|   |-- config.py                    #   Path constants
-|   |-- utils.py                     #   Shared helpers
-|-- hooks/                           # Claude Code hooks
-|   |-- session-start.py             #   Injects knowledge into every session
-|   |-- session-end.py               #   Extracts conversation -> daily log
-|   |-- pre-compact.py               #   Safety net: captures context before compaction
-|-- reports/                         # Lint reports (gitignored)
+|   |-- settings.json                # Configuração de hooks (ativa automaticamente no Claude Code)
+|-- .gitignore                       # Exclui estado de runtime, arquivos temporários, caches
+|-- AGENTS.md                        # Este arquivo — esquema + referência técnica completa
+|-- README.md                        # Visão geral concisa + início rápido
+|-- pyproject.toml                   # Dependências (na raiz para que hooks possam encontrar)
+|-- daily/                           # "Código-fonte" — logs de conversa (imutáveis)
+|-- knowledge/                       # "Executável" — conhecimento compilado (propriedade do LLM)
+|   |-- index.md                     #   Catálogo mestre — o mecanismo de recuperação
+|   |-- log.md                       #   Log de compilação append-only
+|   |-- concepts/                    #   Artigos atômicos de conhecimento
+|   |-- connections/                 #   Insights transversais ligando 2+ conceitos
+|   |-- qa/                          #   Respostas arquivadas (conhecimento composto)
+|-- scripts/                         # Ferramentas CLI
+|   |-- compile.py                   #   Compila logs diários -> artigos de conhecimento
+|   |-- query.py                     #   Faz perguntas (guiado por índice, sem RAG)
+|   |-- lint.py                      #   7 verificações de saúde
+|   |-- flush.py                     #   Extrai memórias de conversas (segundo plano)
+|   |-- config.py                    #   Constantes de caminho
+|   |-- utils.py                     #   Utilitários compartilhados
+|-- hooks/                           # Hooks do Claude Code
+|   |-- session-start.py             #   Injeta conhecimento em cada sessão
+|   |-- session-end.py               #   Extrai conversa -> log diário
+|   |-- pre-compact.py               #   Rede de segurança: captura contexto antes da compactação
+|-- reports/                         # Relatórios de lint (gitignored)
 ```
 
 ---
 
-## Hook System (Automatic Capture)
+## Sistema de Hooks (Captura Automática)
 
-Hooks are configured in `.claude/settings.json` and fire automatically when you use Claude Code in this project.
+Os hooks são configurados em `.claude/settings.json` e disparam automaticamente quando você usa o Claude Code neste projeto.
 
-### `.claude/settings.json` Format
+### Formato de `.claude/settings.json`
 
-There are two install modes. Pick based on where you want hooks to fire.
+Há dois modos de instalação. Escolha com base em onde deseja que os hooks disparem.
 
-**Mode 1: Local-only (hooks fire only when `cwd` is this repo)**
+**Modo 1: Apenas local (hooks disparam somente quando `cwd` é este repositório)**
 
-This is what ships in the repo by default. Relative paths only resolve correctly when Claude Code's `cwd` is the credco-memory-compiler clone itself:
+Este é o modo padrão do repositório. Caminhos relativos só resolvem corretamente quando o `cwd` do Claude Code é o próprio clone do credco-memory-compiler:
 
 ```json
 {
@@ -341,9 +361,9 @@ This is what ships in the repo by default. Relative paths only resolve correctly
 }
 ```
 
-**Mode 2: Cross-project (hooks fire from any project — recommended for daily use)**
+**Modo 2: Cross-project (hooks disparam de qualquer projeto — recomendado para uso diário)**
 
-Place this `.claude/settings.json` either in another project (project-scoped) or in `~/.claude/settings.json` (global, fires in every Claude Code session). Replace `<ROOT>` with the absolute path to the credco-memory-compiler clone:
+Coloque este `.claude/settings.json` em outro projeto (escopo de projeto) ou em `~/.claude/settings.json` (global, dispara em toda sessão do Claude Code). Substitua `<ROOT>` pelo caminho absoluto do clone do credco-memory-compiler:
 
 ```json
 {
@@ -355,71 +375,71 @@ Place this `.claude/settings.json` either in another project (project-scoped) or
 }
 ```
 
-The `--directory <ROOT>` flag tells `uv` where to find `pyproject.toml` regardless of the current working directory. Without it, hooks silently fail in any project that isn't credco-memory-compiler itself — `uv` exits looking for a `pyproject.toml` it can't find, with no message visible to the user.
+O flag `--directory <ROOT>` diz ao `uv` onde encontrar o `pyproject.toml` independentemente do diretório de trabalho atual. Sem ele, os hooks falham silenciosamente em qualquer projeto que não seja o credco-memory-compiler — o `uv` encerra procurando um `pyproject.toml` que não consegue encontrar, sem mensagem visível ao usuário.
 
-Empty `matcher` catches all events.
+`matcher` vazio captura todos os eventos.
 
-### Hook Details
+### Detalhes dos Hooks
 
 **`session-start.py`** (SessionStart)
-- Pure local I/O, no API calls, runs in under 1 second
-- Reads `knowledge/index.md` and the most recent daily log
-- Outputs JSON to stdout: `{"hookSpecificOutput": {"hookEventName": "SessionStart", "additionalContext": "..."}}`
-- Claude sees the knowledge base index at the start of every session
-- Max context: 20,000 characters
+- I/O local puro, sem chamadas de API, executa em menos de 1 segundo
+- Lê `knowledge/index.md` e o log diário mais recente
+- Emite JSON para stdout: `{"hookSpecificOutput": {"hookEventName": "SessionStart", "additionalContext": "..."}}`
+- O Claude vê o índice da base de conhecimento no início de cada sessão
+- Contexto máximo: 20.000 caracteres
 
 **`session-end.py`** (SessionEnd)
-- Reads hook input from stdin (JSON with `session_id`, `transcript_path`, `cwd`)
-- Copies the raw JSONL transcript to a temp file (no parsing in the hook - keeps it fast)
-- Spawns `flush.py` as a fully detached background process
-- Recursion guard: exits immediately if `CLAUDE_INVOKED_BY` env var is set
+- Lê input do hook do stdin (JSON com `session_id`, `transcript_path`, `cwd`)
+- Copia o transcript JSONL bruto para um arquivo temporário (sem parsing no hook — mantém rápido)
+- Spawna `flush.py` como processo de segundo plano totalmente desanexado
+- Guarda contra recursão: sai imediatamente se a variável de ambiente `CLAUDE_INVOKED_BY` estiver definida
 
 **`pre-compact.py`** (PreCompact)
-- Same architecture as session-end.py
-- Fires before Claude Code auto-compacts the context window
-- Guards against empty `transcript_path` (known Claude Code bug #13668)
-- Critical for long sessions: captures context before summarization discards it
+- Mesma arquitetura que session-end.py
+- Dispara antes que o Claude Code compacte automaticamente a janela de contexto
+- Protege contra `transcript_path` vazio (bug conhecido do Claude Code #13668)
+- Crítico para sessões longas: captura o contexto antes que a sumarização o descarte
 
-**Why both PreCompact and SessionEnd?** Long-running sessions may trigger multiple auto-compactions before you close the session. Without PreCompact, intermediate context is lost to summarization before SessionEnd ever fires.
+**Por que tanto PreCompact quanto SessionEnd?** Sessões longas podem disparar múltiplas compactações automáticas antes de você fechar a sessão. Sem PreCompact, o contexto intermediário se perde na sumarização antes que o SessionEnd ever dispare.
 
-### Background Flush Process (`flush.py`)
+### Processo de Flush em Segundo Plano (`flush.py`)
 
-Spawned by both hooks as a fully detached background process:
-- **Windows:** `CREATE_NEW_PROCESS_GROUP | DETACHED_PROCESS` flags
+Spawnado por ambos os hooks como processo de segundo plano totalmente desanexado:
+- **Windows:** flags `CREATE_NEW_PROCESS_GROUP | DETACHED_PROCESS`
 - **Mac/Linux:** `start_new_session=True`
 
-This ensures flush.py survives after Claude Code's hook process exits.
+Isso garante que flush.py sobreviva após a saída do processo de hook do Claude Code.
 
-**What flush.py does:**
-1. Sets `CLAUDE_INVOKED_BY=memory_flush` env var (prevents recursive hook firing)
-2. Reads the pre-extracted conversation context from the temp `.md` file
-3. Skips if context is empty or if same session was flushed within 60 seconds (deduplication)
-4. Calls Claude Agent SDK (`query()` with `allowed_tools=[]`, `max_turns=2`)
-5. Claude decides what's worth saving - returns structured bullet points or `FLUSH_OK`
-6. Appends result to `daily/YYYY-MM-DD.md`
-7. Cleans up temp context file
-8. **End-of-day auto-compilation:** If it's past 6 PM local time (`COMPILE_AFTER_HOUR = 18`) and today's daily log has changed since its last compilation (hash comparison against `state.json`), spawns `compile.py` as another detached background process. This means compilation happens automatically once a day without needing a cron job or manual trigger.
+**O que flush.py faz:**
+1. Define a variável de ambiente `CLAUDE_INVOKED_BY=memory_flush` (evita disparo recursivo de hooks)
+2. Lê o contexto de conversa pré-extraído do arquivo `.md` temporário
+3. Pula se o contexto estiver vazio ou se a mesma sessão foi processada dentro de 60 segundos (deduplicação)
+4. Chama o Claude Agent SDK (`query()` com `allowed_tools=[]`, `max_turns=2`)
+5. O Claude decide o que vale salvar — retorna pontos estruturados ou `FLUSH_OK`
+6. Adiciona o resultado em `daily/YYYY-MM-DD.md`
+7. Remove o arquivo de contexto temporário
+8. **Compilação automática no final do dia:** Se for após as 18h no horário local (`COMPILE_AFTER_HOUR = 18`) e o log diário de hoje mudou desde sua última compilação (comparação de hash contra `state.json`), spawna `compile.py` como outro processo de segundo plano desanexado. Isso significa que a compilação acontece automaticamente uma vez por dia sem precisar de cron job ou trigger manual.
 
-### JSONL Transcript Format
+### Formato de Transcript JSONL
 
-Claude Code stores conversations as `.jsonl` files. Messages are nested under a `message` key:
+O Claude Code armazena conversas como arquivos `.jsonl`. As mensagens ficam aninhadas sob a chave `message`:
 
 ```python
 entry = json.loads(line)
 msg = entry.get("message", {})
-role = msg.get("role", "")     # "user" or "assistant"
-content = msg.get("content", "")  # string or list of content blocks
+role = msg.get("role", "")     # "user" ou "assistant"
+content = msg.get("content", "")  # string ou lista de blocos de conteúdo
 ```
 
-Content can be a string or a list of blocks (`{"type": "text", "text": "..."}` dicts).
+O conteúdo pode ser uma string ou uma lista de blocos (`{"type": "text", "text": "..."}` dicts).
 
 ---
 
-## Script Details
+## Detalhes dos Scripts
 
-### compile.py - The Compiler
+### compile.py - O Compilador
 
-Uses the Claude Agent SDK's async streaming `query()`:
+Usa o `query()` assíncrono com streaming do Claude Agent SDK:
 
 ```python
 async for message in query(
@@ -434,162 +454,162 @@ async for message in query(
 ):
 ```
 
-- Builds a prompt with: AGENTS.md schema, current index, all existing articles, and the daily log
-- Claude reads the daily log, decides what concepts to extract, and writes files directly
-- `permission_mode="acceptEdits"` auto-approves all file operations
-- Incremental: tracks SHA-256 hashes of daily logs in `state.json`, skips unchanged files
-- Cost: ~$0.45-0.65 per daily log (increases as KB grows)
+- Constrói um prompt com: esquema AGENTS.md, índice atual, todos os artigos existentes e o log diário
+- O Claude lê o log diário, decide quais conceitos extrair e escreve os arquivos diretamente
+- `permission_mode="acceptEdits"` aprova automaticamente todas as operações de arquivo
+- Incremental: rastreia hashes SHA-256 dos logs diários em `state.json`, pula arquivos não modificados
+- Custo: ~US$0,45-0,65 por log diário (aumenta conforme a KB cresce)
 
 **CLI:**
 ```bash
-uv run python scripts/compile.py              # compile new/changed only
-uv run python scripts/compile.py --all        # force recompile everything
+uv run python scripts/compile.py              # compila apenas novos/modificados
+uv run python scripts/compile.py --all        # força recompilação de tudo
 uv run python scripts/compile.py --file daily/2026-04-01.md
 uv run python scripts/compile.py --dry-run
 ```
 
-### query.py - Index-Guided Retrieval
+### query.py - Recuperação Guiada por Índice
 
-Loads the entire knowledge base into context (index + all articles). No RAG.
+Carrega toda a base de conhecimento no contexto (índice + todos os artigos). Sem RAG.
 
-At personal KB scale (50-500 articles), the LLM reading a structured index outperforms vector similarity. The LLM understands what you're really asking; cosine similarity just finds similar words.
-
-**CLI:**
-```bash
-uv run python scripts/query.py "What auth patterns do I use?"
-uv run python scripts/query.py "What's my error handling strategy?" --file-back
-```
-
-With `--file-back`, creates a Q&A article in `knowledge/qa/` and updates the index and log. This is the compounding loop - every question makes the KB smarter.
-
-### lint.py - Health Checks
-
-Seven checks:
-
-| Check | Type | Catches |
-|-------|------|---------|
-| Broken links | Structural | `[[wikilinks]]` to non-existent articles |
-| Orphan pages | Structural | Articles with zero inbound links |
-| Orphan sources | Structural | Daily logs not yet compiled |
-| Stale articles | Structural | Source logs changed since compilation |
-| Missing backlinks | Structural | A links to B but B doesn't link back |
-| Sparse articles | Structural | Under 200 words |
-| Contradictions | LLM | Conflicting claims across articles |
+Na escala de KB pessoal (50-500 artigos), o LLM lendo um índice estruturado supera a similaridade vetorial. O LLM entende o que você realmente está perguntando; a similaridade por cosseno apenas encontra palavras similares.
 
 **CLI:**
 ```bash
-uv run python scripts/lint.py                    # all checks
-uv run python scripts/lint.py --structural-only  # skip LLM check (free)
+uv run python scripts/query.py "Quais padrões de auth uso?"
+uv run python scripts/query.py "Qual é minha estratégia de tratamento de erros?" --file-back
 ```
 
-Reports saved to `reports/lint-YYYY-MM-DD.md`.
+Com `--file-back`, cria um artigo de Q&A em `knowledge/qa/` e atualiza o índice e o log. Este é o loop composto — cada pergunta torna a KB mais inteligente.
+
+### lint.py - Verificações de Saúde
+
+Sete verificações:
+
+| Verificação | Tipo | Detecta |
+|-------------|------|---------|
+| Links quebrados | Estrutural | `[[wikilinks]]` para artigos inexistentes |
+| Páginas órfãs | Estrutural | Artigos com zero links de entrada |
+| Fontes órfãs | Estrutural | Logs diários ainda não compilados |
+| Artigos desatualizados | Estrutural | Logs de origem modificados desde a compilação |
+| Backlinks ausentes | Estrutural | A linka para B mas B não linka de volta |
+| Artigos esparsos | Estrutural | Abaixo de 200 palavras |
+| Contradições | LLM | Afirmações conflitantes entre artigos |
+
+**CLI:**
+```bash
+uv run python scripts/lint.py                    # todas as verificações
+uv run python scripts/lint.py --structural-only  # pula verificação LLM (gratuito)
+```
+
+Relatórios salvos em `reports/lint-YYYY-MM-DD.md`.
 
 ---
 
-## State Tracking
+## Rastreamento de Estado
 
-`scripts/state.json` tracks:
-- `ingested` - map of daily log filenames to SHA-256 hashes, compilation timestamps, and costs
-- `query_count` - total queries run
-- `last_lint` - timestamp of most recent lint
-- `total_cost` - cumulative API cost
+`scripts/state.json` rastreia:
+- `ingested` — mapa de nomes de arquivos de log diário para hashes SHA-256, timestamps de compilação e custos
+- `query_count` — total de consultas executadas
+- `last_lint` — timestamp do lint mais recente
+- `total_cost` — custo acumulado de API
 
-`scripts/last-flush.json` tracks flush deduplication (session_id + timestamp).
+`scripts/last-flush.json` rastreia deduplicação de flush (session_id + timestamp).
 
-Both are gitignored and regenerated automatically.
-
----
-
-## Dependencies
-
-`pyproject.toml` (at project root):
-- `claude-agent-sdk>=0.1.29` - Claude Agent SDK for LLM calls with tool use
-- `python-dotenv>=1.0.0` - Environment variable management
-- `tzdata>=2024.1` - Timezone data
-- Python 3.12+, managed by [uv](https://docs.astral.sh/uv/)
-
-No API key needed - uses Claude Code's built-in credentials at `~/.claude/.credentials.json`.
+Ambos são gitignored e regenerados automaticamente.
 
 ---
 
-## Costs
+## Dependências
 
-| Operation | Cost |
-|-----------|------|
-| Compile one daily log | $0.45-0.65 |
-| Query (no file-back) | ~$0.15-0.25 |
-| Query (with file-back) | ~$0.25-0.40 |
-| Full lint (with contradictions) | ~$0.15-0.25 |
-| Structural lint only | $0.00 |
-| Memory flush (per session) | ~$0.02-0.05 |
+`pyproject.toml` (na raiz do projeto):
+- `claude-agent-sdk>=0.1.29` - Claude Agent SDK para chamadas LLM com uso de ferramentas
+- `python-dotenv>=1.0.0` - Gerenciamento de variáveis de ambiente
+- `tzdata>=2024.1` - Dados de fuso horário
+- Python 3.12+, gerenciado por [uv](https://docs.astral.sh/uv/)
+
+Nenhuma chave de API necessária — usa as credenciais integradas do Claude Code em `~/.claude/.credentials.json`.
 
 ---
 
-## Troubleshooting
+## Custos
 
-The single most useful diagnostic is `scripts/flush.log`. Both hooks and `flush.py` append there with timestamps, so when something appears to "not work," start there:
+| Operação | Custo |
+|----------|-------|
+| Compilar um log diário | US$0,45-0,65 |
+| Consulta (sem file-back) | ~US$0,15-0,25 |
+| Consulta (com file-back) | ~US$0,25-0,40 |
+| Lint completo (com contradições) | ~US$0,15-0,25 |
+| Lint estrutural apenas | US$0,00 |
+| Memory flush (por sessão) | ~US$0,02-0,05 |
+
+---
+
+## Solução de Problemas
+
+O diagnóstico mais útil é `scripts/flush.log`. Tanto os hooks quanto o `flush.py` adicionam entradas com timestamps, então quando algo parece "não funcionar", comece por aqui:
 
 ```bash
 tail -50 scripts/flush.log
 ```
 
-### Common failure modes
+### Modos de falha comuns
 
-| Symptom | Likely cause | Fix |
-|---|---|---|
-| No `daily/YYYY-MM-DD.md` ever appears | Hook command path resolves incorrectly | Use absolute paths with `uv run --directory <ROOT>` (see Mode 2 in Hook System section) |
-| `flush.log` shows `uv: command not found` | Hook shell doesn't have `uv` on PATH | Add `~/.local/bin` to PATH in shell rc; restart terminal |
-| `flush.log` shows `No \`pyproject.toml\` found` | Same as above — relative path issue | Same fix |
-| `flush.log` shows `SKIP: only N turns (min 3)` | Conversation too short | Have a 3+ turn conversation before exiting |
-| `flush.log` shows `SKIP: no transcript path` | Known Claude Code bug #13668 | Harmless. Next session works |
-| Daily log gets duplicate entries | Race between PreCompact + SessionEnd | Already mitigated by `last-flush.json` dedup (120s window) |
-| `flush.log` grows huge over months | No log rotation built in | Manually `rm scripts/flush.log` periodically, or add `RotatingFileHandler` |
-| `compile.py` never runs automatically | After-hours check failed for your timezone | Set `COMPILE_AFTER_HOUR` in `flush.py` and `TIMEZONE` in `config.py` to your timezone; or run `uv run python scripts/compile.py` manually |
+| Sintoma | Causa provável | Correção |
+|---------|----------------|---------|
+| Nenhum `daily/YYYY-MM-DD.md` aparece | Caminho do comando do hook resolve incorretamente | Use caminhos absolutos com `uv run --directory <ROOT>` (veja Modo 2 na seção Hook System) |
+| `flush.log` mostra `uv: command not found` | Shell do hook não tem `uv` no PATH | Adicione `~/.local/bin` ao PATH no rc do shell; reinicie o terminal |
+| `flush.log` mostra `No \`pyproject.toml\` found` | Mesma causa — problema de caminho relativo | Mesma correção |
+| `flush.log` mostra `SKIP: only N turns (min 3)` | Conversa muito curta | Tenha uma conversa de 3+ turnos antes de sair |
+| `flush.log` mostra `SKIP: no transcript path` | Bug conhecido do Claude Code #13668 | Inofensivo. A próxima sessão funciona |
+| Log diário recebe entradas duplicadas | Corrida entre PreCompact + SessionEnd | Já mitigado pelo dedup em `last-flush.json` (janela de 120s) |
+| `flush.log` cresce muito ao longo dos meses | Sem rotação de log embutida | Remova manualmente `scripts/flush.log` periodicamente, ou adicione `RotatingFileHandler` |
+| `compile.py` nunca executa automaticamente | Verificação pós-horário falhou para seu fuso | Defina `COMPILE_AFTER_HOUR` em `flush.py` e `TIMEZONE` em `config.py` para seu fuso; ou execute `uv run python scripts/compile.py` manualmente |
 
-### Smoke tests (run after install)
+### Testes de fumaça (execute após instalação)
 
 ```bash
-# 1. SessionStart hook should print JSON
+# 1. O hook SessionStart deve imprimir JSON
 uv run python hooks/session-start.py
 
-# 2. Structural lint should pass (no LLM call, free)
+# 2. Lint estrutural deve passar (sem chamada LLM, gratuito)
 uv run python scripts/lint.py --structural-only
 
-# 3. Compile dry-run (won't actually run if no daily logs exist)
+# 3. Compilação dry-run (não executa se não houver logs diários)
 uv run python scripts/compile.py --dry-run
 ```
 
-If all three pass without exception, the base install is good. From there, the only remaining failure points are hook path configuration (Mode 1 vs Mode 2) and `uv` being on PATH inside the hook's subshell.
+Se os três passarem sem exceção, a instalação base está OK. A partir daí, os únicos pontos de falha restantes são a configuração do caminho do hook (Modo 1 vs Modo 2) e o `uv` estar no PATH dentro do subshell do hook.
 
-### Verifying end-to-end after hook activation
+### Verificando end-to-end após ativação do hook
 
 ```bash
-# Open Claude Code in a project where hooks are active
-# Have a 3+ turn conversation, then /exit
-# Wait ~30s (flush.py runs async)
+# Abra o Claude Code em um projeto onde os hooks estão ativos
+# Tenha uma conversa de 3+ turnos, depois /exit
+# Aguarde ~30s (flush.py executa assincronamente)
 
-# Check that a daily log was generated
+# Verifique se um log diário foi gerado
 ls -lh <ROOT>/daily/
 
-# Check flush.log for confirmation that flush.py ran end-to-end
+# Verifique o flush.log para confirmar que flush.py executou até o fim
 tail -30 <ROOT>/scripts/flush.log
 
-# Manually inspect what got captured
+# Inspecione manualmente o que foi capturado
 cat <ROOT>/daily/$(date +%Y-%m-%d).md
 ```
 
 ---
 
-## Customization
+## Personalização
 
-### Additional Article Types
+### Tipos Adicionais de Artigo
 
-Add directories like `people/`, `projects/`, `tools/` to `knowledge/`. Define the article format in this file (AGENTS.md) and update `utils.py`'s `list_wiki_articles()` to include them.
+Adicione diretórios como `people/`, `projects/`, `tools/` em `knowledge/`. Defina o formato do artigo neste arquivo (AGENTS.md) e atualize `list_wiki_articles()` em `utils.py` para incluí-los.
 
-### Obsidian Integration
+### Integração com Obsidian
 
-The knowledge base is pure markdown with `[[wikilinks]]` - works natively in Obsidian. Point a vault at `knowledge/` for graph view, backlinks, and search.
+A base de conhecimento é puro markdown com `[[wikilinks]]` — funciona nativamente no Obsidian. Aponte um vault para `knowledge/` para visualização em grafo, backlinks e busca.
 
-### Scaling Beyond Index-Guided Retrieval
+### Escalando Além da Recuperação Guiada por Índice
 
-At ~2,000+ articles / ~2M+ tokens, the index becomes too large for the context window. At that point, add hybrid RAG (keyword + semantic search) as a retrieval layer before the LLM. See Karpathy's recommendation of `qmd` by Tobi Lutke for search at scale.
+Com ~2.000+ artigos / ~2M+ tokens, o índice se torna grande demais para a janela de contexto. Nesse ponto, adicione RAG híbrido (busca por palavras-chave + semântica) como camada de recuperação antes do LLM. Veja a recomendação de Karpathy de usar `qmd` de Tobi Lutke para busca em escala.
